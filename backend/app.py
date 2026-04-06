@@ -1,7 +1,7 @@
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from pptx import Presentation
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import os
 import io
 
@@ -9,18 +9,16 @@ app = Flask(__name__)
 # Enable CORS so the React frontend can communicate with the Flask backend
 CORS(app)
 
-translator = Translator()
-
 def translate_text(text, target_lang='kn'):
     """
-    Translates text to the target language using googletrans.
+    Translates text to the target language using deep_translator.
     Returns the original text if translation fails.
     """
     try:
         if not text or not text.strip():
             return text
-        translation = translator.translate(text, dest=target_lang)
-        return translation.text
+        translation = GoogleTranslator(source='auto', target=target_lang).translate(text)
+        return translation
     except Exception as e:
         print(f"Translation Error: {e}")
         return text
