@@ -12,24 +12,26 @@ import time
 
 def get_font_for_lang(lang='kn'):
     fonts = {
-        'kn': ('NotoSansKannada-Regular.ttf', 'https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansKannada/NotoSansKannada-Regular.ttf'),
-        'hi': ('NotoSansDevanagari-Regular.ttf', 'https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf'),
-        'te': ('NotoSansTelugu-Regular.ttf', 'https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansTelugu/NotoSansTelugu-Regular.ttf'),
-        'ta': ('NotoSansTamil-Regular.ttf', 'https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansTamil/NotoSansTamil-Regular.ttf')
+        'kn': ('NotoSansKannada-Regular.ttf', 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansKannada/NotoSansKannada-Regular.ttf'),
+        'hi': ('NotoSansDevanagari-Regular.ttf', 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf'),
+        'te': ('NotoSansTelugu-Regular.ttf', 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansTelugu/NotoSansTelugu-Regular.ttf'),
+        'ta': ('NotoSansTamil-Regular.ttf', 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansTamil/NotoSansTamil-Regular.ttf')
     }
     font_file, url = fonts.get(lang, fonts['kn'])
-    font_path = os.path.join(os.path.dirname(__file__), font_file)
+    import tempfile
+    font_path = os.path.join(tempfile.gettempdir(), font_file)
     
-    if not os.path.exists(font_path):
+    # If font doesn't exist or is a corrupted Git LFS pointer (<50KB), force a fresh download
+    if not os.path.exists(font_path) or os.path.getsize(font_path) < 50000:
         import urllib.request
         try:
-            print(f"Downloading font for {lang}...")
+            print(f"Downloading pure font from Google for {lang}...")
             urllib.request.urlretrieve(url, font_path)
-            print("Font downloaded.")
+            print("Font securely downloaded to Temp Directory.")
         except Exception as e:
             print(f"Failed to download font: {e}")
             
-    return font_path if os.path.exists(font_path) else None
+    return font_path if os.path.exists(font_path) and os.path.getsize(font_path) > 50000 else None
 
 app = Flask(__name__)
 # Enable CORS so the React frontend can communicate with the Flask backend
