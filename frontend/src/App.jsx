@@ -45,11 +45,11 @@ function App() {
   const handleUpload = async () => {
     if (!file) return;
 
-    const validExtensions = ['ppt', 'pptx', 'pdf'];
+    const validExtensions = ['ppt', 'pptx', 'pdf', 'docx', 'doc', 'txt'];
     const extension = file.name.split('.').pop().toLowerCase();
 
     if (!validExtensions.includes(extension)) {
-      setErrorMsg('Invalid file format. Please upload a pure PPTX file for perfect conversion.');
+      setErrorMsg('Invalid file format. Please upload a PPTX, DOCX, TXT, or PDF file.');
       setStatus('error');
       return;
     }
@@ -72,7 +72,7 @@ function App() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Connection to the AI Engine failed. Ensure Backend is running.');
+        throw new Error(errorData.error || 'Connection failed (Failed to fetch). If using a free cloud backend, it might take 50 seconds to wake up! Please try again in a minute.');
       }
 
       const blob = await response.blob();
@@ -144,7 +144,7 @@ function App() {
             </span>
           </h2>
           <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
-            Upload your `.pptx` presentations. We extract the text, run it through AI translation, and seamlessly piece it back together—perfect formats guaranteed.
+            Upload your `.pptx`, `.docx`, `.txt`, or `.pdf` files. We extract the text, run it through AI translation, and seamlessly piece it back together—perfect formats guaranteed for PPTX and DOCX!
           </p>
         </div>
 
@@ -200,7 +200,7 @@ function App() {
                     ref={fileInputRef}
                     type="file"
                     className="hidden"
-                    accept=".ppt,.pptx,.pdf"
+                    accept=".ppt,.pptx,.pdf,.docx,.doc,.txt"
                     onChange={handleChange}
                   />
 
@@ -212,7 +212,7 @@ function App() {
                       </div>
                       <p className="text-2xl font-bold text-white mb-3">Drop presentation here</p>
                       <p className="text-slate-400 text-center font-medium max-w-[250px]">
-                        Or click to browse from your computer. Supports PPTX formats perfectly.
+                        Or click to browse from your computer. Supports PPTX, DOCX, TXT, and PDF.
                       </p>
                     </>
                   ) : (
