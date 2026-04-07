@@ -301,7 +301,7 @@ function App() {
 
                 <h3 className="text-4xl font-extrabold text-white mb-4">Mission Accomplished!</h3>
                 <p className="text-slate-400 text-lg font-light mb-10 max-w-md mx-auto">
-                  Your beautifully translated `.{file?.name.split('.').pop()}` is polished and perfectly aligned. Ready for presentation.
+                  Your beautifully translated document is polished and perfectly aligned. Ready for presentation.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-5 w-full justify-center">
@@ -313,7 +313,7 @@ function App() {
                   </button>
                   <a
                     href={downloadUrl}
-                    download={`Localized_${file?.name}`}
+                    download={`Localized_${file?.name.toLowerCase().endsWith('.pdf') ? file.name.replace(/\.pdf$/i, '.docx') : file?.name}`}
                     className="px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-[0_0_30px_rgba(79,70,229,0.4)] flex items-center justify-center gap-3 transition-all hover:scale-105 hover:-translate-y-1 text-lg border border-blue-400/30"
                   >
                     <Download className="w-6 h-6" />

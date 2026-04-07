@@ -148,6 +148,10 @@ def handle_translation():
             for run in all_runs:
                 if run.text in translation_map:
                     run.text = translation_map[run.text]
+                    try:
+                        run.font.name = 'Nirmala UI'
+                    except Exception:
+                        pass
             
             output_bytes = io.BytesIO()
             prs.save(output_bytes)
@@ -183,6 +187,10 @@ def handle_translation():
                     for run in paragraph.runs:
                         if run.text and run.text.strip() and run.text in translation_map:
                             run.text = translation_map[run.text]
+                            try:
+                                run.font.name = 'Nirmala UI'
+                            except Exception:
+                                pass
                 for table in doc.tables:
                     for row in table.rows:
                         for cell in row.cells:
@@ -190,6 +198,10 @@ def handle_translation():
                                 for run in paragraph.runs:
                                     if run.text and run.text.strip() and run.text in translation_map:
                                         run.text = translation_map[run.text]
+                                        try:
+                                            run.font.name = 'Nirmala UI'
+                                        except Exception:
+                                            pass
                 
                 output_bytes = io.BytesIO()
                 doc.save(output_bytes)
@@ -277,9 +289,12 @@ def handle_translation():
             translated_text = "\n".join(translated_lines)
             
             from docx import Document
+            from docx.shared import Pt
             output_doc = Document()
             for paragraph in translated_text.split('\n'):
-                output_doc.add_paragraph(paragraph)
+                p = output_doc.add_paragraph()
+                r = p.add_run(paragraph)
+                r.font.name = 'Nirmala UI'
                 
             output_bytes = io.BytesIO()
             output_doc.save(output_bytes)
