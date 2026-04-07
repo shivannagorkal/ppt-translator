@@ -4,7 +4,6 @@ from pptx import Presentation
 from docx import Document
 import pdfplumber
 from fpdf import FPDF
-import uharfbuzz as hb
 from deep_translator import GoogleTranslator
 from concurrent.futures import ThreadPoolExecutor
 import os
