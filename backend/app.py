@@ -76,13 +76,15 @@ def batch_translate(texts, target_lang='kn'):
     translations = {}
     
     def fetch_translation(text):
-        import time, random
-        time.sleep(random.uniform(0.1, 0.5)) # Jitter prevents instant IP rate blocks on large docs
+        import time
+        # CRITICAL: Render datacenter IPs are aggressively blocked by Google if requested concurrently.
+        # We must enforce a hard 1.5 second pause to simulate human pacing and avoid 429 Too Many Requests.
+        time.sleep(1.5) 
         translated = translate_text(text, target_lang)
         return text, translated
 
-    # Use max_workers=5 to prevent Google Translate rate limits while staying fast
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    # Force sequential polling (max_workers=1) to evade Google Datacenter Firewall bans on live deploy
+    with ThreadPoolExecutor(max_workers=1) as executor:
         results = executor.map(fetch_translation, unique_texts)
         for original, translated in results:
             translations[original] = translated
