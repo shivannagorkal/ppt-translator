@@ -281,13 +281,6 @@ def handle_translation():
             pdf.set_auto_page_break(auto=True, margin=15) # guarantees smooth multi-page layouts
             pdf.add_page()
             
-            # Enable real font shaping for complete unicode ligatures natively!
-            try:
-                import uharfbuzz
-                pdf.set_text_shaping(True)
-            except Exception as e:
-                print("uharfbuzz missing, basic shaping active.")
-            
             font_path = get_font_for_lang(target_lang)
             try:
                 if font_path:
@@ -298,6 +291,14 @@ def handle_translation():
             except Exception as e:
                 print("Font mapping failed, using Helvetica:", e)
                 pdf.set_font("Helvetica", size=11)
+                
+            # CRITICAL: We must enable text shaping AFTER setting the custom font!
+            # Otherwise, the shaper bounds sync to Helvetica and corrupt the PDF stream.
+            try:
+                import uharfbuzz
+                pdf.set_text_shaping(True)
+            except Exception as e:
+                print("uharfbuzz missing, basic shaping active.")
                 
             for paragraph in translated_text.split('\n'):
                 # Break long unwrappable words and force safe line widths to bypass fpdf2 crash
