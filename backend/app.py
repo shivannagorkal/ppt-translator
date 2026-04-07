@@ -276,53 +276,21 @@ def handle_translation():
                 
             translated_text = "\n".join(translated_lines)
             
-            from fpdf import FPDF
-            import textwrap
-            
-            pdf = FPDF()
-            pdf.set_auto_page_break(auto=True, margin=15) # guarantees smooth multi-page layouts
-            pdf.add_page()
-            
-            font_path = get_font_for_lang(target_lang)
-            try:
-                if font_path:
-                    pdf.add_font("CustomFont", fname=font_path)
-                    pdf.set_font("CustomFont", size=11)
-                else:
-                    pdf.set_font("Helvetica", size=11)
-            except Exception as e:
-                print("Font mapping failed, using Helvetica:", e)
-                pdf.set_font("Helvetica", size=11)
-                
-            # CRITICAL: We must enable text shaping AFTER setting the custom font!
-            # Otherwise, the shaper bounds sync to Helvetica and corrupt the PDF stream.
-            try:
-                import uharfbuzz
-                pdf.set_text_shaping(True)
-            except Exception as e:
-                print("uharfbuzz missing, basic shaping active.")
-                
+            from docx import Document
+            output_doc = Document()
             for paragraph in translated_text.split('\n'):
-                # Break long unwrappable words and force safe line widths to bypass fpdf2 crash
-                wrapped_lines = textwrap.wrap(paragraph, width=85, break_long_words=True)
-                if not wrapped_lines:
-                    pdf.ln(8) # Empty line gap
-                else:
-                    for line in wrapped_lines:
-                        try:
-                            pdf.cell(0, 8, text=line, new_x="LMARGIN", new_y="NEXT")
-                        except Exception as e:
-                            print(f"FPDF skipped line: {e}")
+                output_doc.add_paragraph(paragraph)
                 
-            pdf_bytes = pdf.output()
-            output_bytes = io.BytesIO(pdf_bytes)
+            output_bytes = io.BytesIO()
+            output_doc.save(output_bytes)
+            output_bytes.seek(0)
             
             base_name = os.path.splitext(file.filename)[0]
             return send_file(
                 output_bytes,
                 as_attachment=True,
-                download_name=f"translated_{base_name}.pdf",
-                mimetype='application/pdf'
+                download_name=f"translated_{base_name}.docx",
+                mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             )
 
         else:
